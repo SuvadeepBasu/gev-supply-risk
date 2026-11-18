@@ -1,0 +1,8 @@
+plant_id,plant_name,materials_tracked,materials_with_new_shortage,earliest_new_stockout_date,material_production_days_lost,cases_at_risk,revenue_at_risk_usd,margin_at_risk_usd,lat,lon,delayed_po_lines,delayed_po_value_usd,risk_level
+PLT-BBS,Bhubaneswar beverage plant,8,3,2026-11-25,5.0,68028.0,451264.0,112738.0,20.3,85.82,4,341578.0,High
+PLT-DEL,Delhi NCR beverage & snacks plant,12,1,2026-11-30,4.3,173953.0,1255941.0,329206.0,28.46,77.03,2,294044.0,High
+PLT-KOL,Kolkata beverage & snacks plant,11,2,2026-11-24,6.3,142620.0,1000398.0,257539.0,22.57,88.36,3,317453.0,High
+PLT-DAC,Dhaka beverage plant,7,1,2026-11-29,1.5,15110.0,98215.0,24176.0,23.81,90.41,1,76443.0,Medium
+PLT-PNQ,Pune snacks plant,5,0,,0.0,0.0,0.0,0.0,18.52,73.86,1,83760.0,Low
+PLT-HYD,Hyderabad snacks & beverage plant,11,1,2026-11-25,1.8,21540.0,140010.0,34464.0,17.39,78.47,2,182606.0,Medium
+PLT-MAA,Chennai beverage plant,8,0,,0.0,0.0,0.0,0.0,13.08,80.27,5,421353.0,Low

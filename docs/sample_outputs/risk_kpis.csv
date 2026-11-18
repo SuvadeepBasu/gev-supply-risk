@@ -1,0 +1,2 @@
+as_of_date,open_po_lines,open_po_value_usd,delayed_po_lines,delayed_po_value_usd,pct_value_delayed,avg_delay_days,max_delay_days,plants_with_new_shortage,materials_with_new_shortage,cases_at_risk,revenue_at_risk_usd,margin_at_risk_usd,recommended_action_cost_usd,margin_protected_usd
+2026-11-18,308,25255884.0,18,1717237.0,6.8,4.6,9,5,8,421251.0,2945828.0,758123.0,26135.0,634658.0
