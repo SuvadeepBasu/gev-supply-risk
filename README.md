@@ -15,7 +15,7 @@ tables (Step 6).
 | 1 | Unity Catalog schemas, master data, open POs, inventory, sample hazards | `src/sql/setup/`, `src/seed/`, `src/jobs/load_sample_data.py` | done, tested locally |
 | 2 | Disruption & delay engine: exposure → delay → shortage → $ at risk → actions → KPIs | `src/sql/risk/` | done, tested locally |
 | 3 | Live hazard feeds: USGS quakes, GDACS cyclones, port congestion CSV | `src/ingest/hazards.py` | parsers tested; first live run on Databricks |
-| 4 | Genie space: tables, instructions, trusted functions, sample questions | `src/genie/space_setup.md`, `src/sql/genie/` | ready to configure |
+| 4 | Supply Risk Forecast assistant (Genie space): tables, instructions, trusted functions, sample questions | `src/genie/space_setup.md`, `src/sql/genie/` | ready to configure |
 | 5 | Bundle: setup job + 30-minute refresh job | `databricks.yml` | ready to deploy |
 | 6 | Swap sample data for real POs, inventory, BOM, suppliers | `ops.*`, `ref.*` views | next |
 | 7 | Databricks App: Cesium globe + Genie chat + KPI strip | `app/` | next |
@@ -28,7 +28,7 @@ databricks bundle deploy -t dev
 databricks bundle run supply_risk_setup -t dev      # sample data + first engine run + Genie functions
 databricks bundle run supply_risk_refresh -t dev    # pulls live USGS / GDACS hazards, recomputes
 ```
-Then create the Genie space with `src/genie/space_setup.md`.
+Then create the Supply Risk Forecast assistant (a Genie space) with `src/genie/space_setup.md`.
 
 ## Run locally (no workspace needed)
 ```bash

@@ -1,6 +1,6 @@
-# Genie space: Supply Risk (Step 4)
+# Genie space: "Supply Risk Forecast" (Step 4)
 
-Create it in the workspace UI (Genie → New), then paste the pieces below.
+Create it in the workspace UI (Genie → New), name it **Supply Risk Forecast**, then paste the pieces below.
 
 ## 1. Data
 Warehouse: a Pro or Serverless SQL warehouse.
