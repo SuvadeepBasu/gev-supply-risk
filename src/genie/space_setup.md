@@ -49,6 +49,8 @@ Rules
 - Which suppliers are inside an active hazard right now?
 - How much would re-sourcing cost versus the margin it protects?
 - Which delayed POs need no action because stock covers the delay?
+- Which plant-materials make up 80% of the margin at risk? (Pareto)
+- What share of delayed PO value does each hazard cause? (pie)
 
 ## 4. Example SQL (add as trusted queries)
 
@@ -71,6 +73,21 @@ FROM gold.po_actions GROUP BY recommended_action ORDER BY margin_at_risk_usd DES
 ```sql
 SELECT plant_name, material_name, disrupted_stockout_date, production_days_lost, margin_at_risk_usd
 FROM gold.plant_material_impact WHERE has_new_shortage ORDER BY disrupted_stockout_date;
+```
+
+**Pareto of margin at risk** (Genie draws this as a bar chart; ask for a combo chart with the cumulative share)
+```sql
+SELECT concat(plant_name, ' · ', material_name) AS item, margin_at_risk_usd,
+       round(100 * sum(margin_at_risk_usd) OVER (ORDER BY margin_at_risk_usd DESC)
+             / sum(margin_at_risk_usd) OVER (), 1) AS cumulative_pct
+FROM gold.plant_material_impact WHERE has_new_shortage
+ORDER BY margin_at_risk_usd DESC;
+```
+
+**Delayed PO value by hazard** (pie)
+```sql
+SELECT event_name, po_value_hit_usd, margin_at_risk_usd
+FROM gold.event_impact ORDER BY po_value_hit_usd DESC;
 ```
 
 ## 5. Benchmarks

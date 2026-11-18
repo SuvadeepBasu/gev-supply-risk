@@ -1,4 +1,4 @@
 event_name,hazard_type,suppliers_exposed,ports_exposed,po_lines_hit,po_value_hit_usd,avg_delay_days_added,margin_at_risk_usd,revenue_at_risk_usd
-Chennai port congestion,port_congestion,0,1,4,404799.0,2.0,0.0,0.0
+Chennai port congestion,port_congestion,0,1,4,404799.0,2.0,20034.0,80338.0
 M5.6 central Myanmar,earthquake,1,0,2,100314.0,3.0,0.0,0.0
-Storm BOB-07,cyclone,5,2,12,1212124.0,5.7,758123.0,2945828.0
+Storm BOB-07,cyclone,5,2,12,1212124.0,5.7,1143038.0,4431305.0

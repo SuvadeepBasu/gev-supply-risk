@@ -4,6 +4,11 @@
 -- receive, then consume daily usage. Inventory cannot go below zero; usage
 -- that cannot be met is lost production (lost-sales, not back-ordered).
 -- The difference between the two runs is the impact of the disruption.
+-- Losses are counted only up to the day the last delayed PO for that plant and
+-- material arrives (the "evaluation window"). After that both runs have received
+-- the same goods, so any later shortage comes from orders not yet placed, not
+-- from the hazard. Without this cut-off, late gaps in the order book get netted
+-- against the real loss and understate it.
 CREATE OR REPLACE TABLE ${catalog}.gold.plant_material_impact AS
 WITH days AS (
   SELECT explode(sequence(0, 59)) AS d
@@ -23,6 +28,12 @@ daily AS (
   LEFT JOIN rcv r ON r.plant_id = i.plant_id AND r.material_id = i.material_id
   GROUP BY i.plant_id, i.material_id, days.d
 ),
+eval AS (
+  SELECT plant_id, material_id,
+         coalesce(max(CASE WHEN is_delayed THEN greatest(datediff(new_eta_date, CAST('${as_of}' AS DATE)), 0) END), 59) AS eval_day
+  FROM ${catalog}.gold.po_delay
+  GROUP BY plant_id, material_id
+),
 arrays AS (
   SELECT plant_id, material_id,
          transform(array_sort(collect_list(struct(d, rb))), x -> x.rb) AS rb_arr,
@@ -39,18 +50,19 @@ sim AS (
       named_struct('inv', CAST(i.on_hand_qty AS DOUBLE), 'lost', 0D, 'first_out', -1, 'day', 0),
       (acc, r) -> named_struct(
         'inv', greatest(acc.inv + r - i.daily_usage_qty, 0D),
-        'lost', acc.lost + greatest(i.daily_usage_qty - (acc.inv + r), 0D),
+        'lost', acc.lost + CASE WHEN acc.day <= coalesce(ev.eval_day, 59) THEN greatest(i.daily_usage_qty - (acc.inv + r), 0D) ELSE 0D END,
         'first_out', CASE WHEN acc.first_out < 0 AND acc.inv + r < i.daily_usage_qty THEN acc.day ELSE acc.first_out END,
         'day', acc.day + 1)) AS base_sim,
     aggregate(a.rd_arr,
       named_struct('inv', CAST(i.on_hand_qty AS DOUBLE), 'lost', 0D, 'first_out', -1, 'day', 0),
       (acc, r) -> named_struct(
         'inv', greatest(acc.inv + r - i.daily_usage_qty, 0D),
-        'lost', acc.lost + greatest(i.daily_usage_qty - (acc.inv + r), 0D),
+        'lost', acc.lost + CASE WHEN acc.day <= coalesce(ev.eval_day, 59) THEN greatest(i.daily_usage_qty - (acc.inv + r), 0D) ELSE 0D END,
         'first_out', CASE WHEN acc.first_out < 0 AND acc.inv + r < i.daily_usage_qty THEN acc.day ELSE acc.first_out END,
         'day', acc.day + 1)) AS dis_sim
   FROM ${catalog}.ops.inventory i
   JOIN arrays a ON a.plant_id = i.plant_id AND a.material_id = i.material_id
+  LEFT JOIN eval ev ON ev.plant_id = i.plant_id AND ev.material_id = i.material_id
 ),
 econ AS (
   -- revenue and margin lost per unit of this material, from the product lines that consume it

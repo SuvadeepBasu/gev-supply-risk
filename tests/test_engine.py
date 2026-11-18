@@ -12,13 +12,14 @@ import run_local_pipeline  # noqa: E402
 AS_OF = "2026-11-18"
 
 
-def simulate(on_hand, usage, receipts_by_day, horizon=60):
+def simulate(on_hand, usage, receipts_by_day, horizon=60, eval_day=59):
     inv, lost, first_out = float(on_hand), 0.0, -1
     for d in range(horizon):
         avail = inv + receipts_by_day.get(d, 0.0)
         if first_out < 0 and avail < usage:
             first_out = d
-        lost += max(usage - avail, 0.0)
+        if d <= eval_day:
+            lost += max(usage - avail, 0.0)
         inv = max(avail - usage, 0.0)
     return lost, first_out
 
@@ -52,8 +53,10 @@ def main():
             dd = max((p.new_eta_date - asof).days, 0)
             rb[db] = rb.get(db, 0) + p.qty
             rd[dd] = rd.get(dd, 0) + p.qty
-        lb, _ = simulate(row.on_hand_qty, row.daily_usage_qty, rb)
-        ld, fo = simulate(row.on_hand_qty, row.daily_usage_qty, rd)
+        late = sub[sub.is_delayed]
+        cut = max((max((p.new_eta_date - asof).days, 0) for _, p in late.iterrows()), default=59)
+        lb, _ = simulate(row.on_hand_qty, row.daily_usage_qty, rb, eval_day=cut)
+        ld, fo = simulate(row.on_hand_qty, row.daily_usage_qty, rd, eval_day=cut)
         r = imp.loc[(row.plant_id, row.material_id)]
         check(abs(r.baseline_lost_qty - round(lb)) <= 1, f"baseline lost mismatch {row.plant_id}/{row.material_id}")
         check(abs(r.disrupted_lost_qty - round(ld)) <= 1, f"disrupted lost mismatch {row.plant_id}/{row.material_id}")

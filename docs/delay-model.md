@@ -37,7 +37,9 @@ margin_at_risk     = cases_at_risk × margin per case
 ```
 Product mix comes from `ref.plant_products` (bill of materials per case).
 Taking the difference means shortages that would happen anyway are not blamed on
-the hazard.
+the hazard. Losses are counted only up to the day the last delayed PO for that
+plant and material arrives: after that both runs hold the same goods, and later
+gaps come from orders not placed yet, not from the hazard.
 
 ## 4. What should procurement do? (`gold.po_actions`)
 A plant-material's impact is shared across its delayed POs by `delay_days × qty`.
