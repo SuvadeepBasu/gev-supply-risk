@@ -20,6 +20,11 @@ tables (Step 6).
 | 6 | Swap sample data for real POs, inventory, BOM, suppliers | `ops.*`, `ref.*` views | next |
 | 7 | Databricks App: Cesium globe + Genie chat + KPI strip | `app/` | next |
 
+## Quick start without the CLI (Free Edition, browser only)
+1. Create a catalog in the SQL editor: `CREATE CATALOG IF NOT EXISTS supply_risk_dev;`
+2. Pull this repo into a Databricks Git folder.
+3. Open `notebooks/01_setup_and_run.py` and click **Run all** (serverless). It loads the sample data, runs the engine, creates the Genie functions and shows the KPIs.
+
 ## Deploy (Steps 1–5)
 ```bash
 databricks auth login --host https://adb-<id>.<n>.azuredatabricks.net
