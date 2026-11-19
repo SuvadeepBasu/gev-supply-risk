@@ -39,6 +39,8 @@ Rules
 - When asked "why", use disruption_drivers and disrupted_stages, and gold.po_milestone_exposure for the stage-level detail.
 - For plant questions prefer gold.fn_plant_disruption; for PO lists prefer gold.fn_delayed_pos; for supplier questions prefer gold.fn_supplier_exposure.
 - If the user names a city, match it to ref.plants.city or ref.suppliers.city.
+- If the user names a hazard ("storm", "cyclone", "BOB-07", "Chennai congestion", "port", "earthquake", "quake", "Myanmar"), filter gold.plant_material_impact on caused_by and gold.po_delay / gold.po_actions on disruption_drivers with LIKE, e.g. caused_by LIKE '%Storm BOB-07%'. Do not include shortages caused by other hazards.
+- For "Pareto" questions, sort by margin_at_risk_usd descending and add a cumulative percentage column.
 - Always state the as_of_date from gold.risk_kpis when giving totals.
 ```
 
@@ -91,4 +93,6 @@ FROM gold.event_impact ORDER BY po_value_hit_usd DESC;
 ```
 
 ## 5. Benchmarks
-Use the sample questions above as benchmark questions, with the example SQL as the expected answers, and re-run them after any change to instructions or tables.
+15 benchmark questions with ground-truth SQL and expected results are in [benchmarks.md](benchmarks.md).
+Add them in the agent's **Benchmark** tab, run them, and re-run after any change to instructions or tables.
+To regenerate the expected results: `python tests/genie_benchmarks.py`.

@@ -64,6 +64,14 @@ sim AS (
   JOIN arrays a ON a.plant_id = i.plant_id AND a.material_id = i.material_id
   LEFT JOIN eval ev ON ev.plant_id = i.plant_id AND ev.material_id = i.material_id
 ),
+drivers AS (
+  -- which hazards delayed the POs for this plant and material (for "because of the storm" questions)
+  SELECT plant_id, material_id,
+         concat_ws(', ', array_sort(array_distinct(flatten(collect_list(split(disruption_drivers, ', ')))))) AS caused_by
+  FROM ${catalog}.gold.po_delay
+  WHERE is_delayed
+  GROUP BY plant_id, material_id
+),
 econ AS (
   -- revenue and margin lost per unit of this material, from the product lines that consume it
   SELECT plant_id, material_id,
@@ -76,7 +84,7 @@ econ AS (
   GROUP BY plant_id, material_id
 )
 SELECT
-  s.plant_id, pl.plant_name, s.material_id, m.material_name, m.uom, e.product_lines,
+  s.plant_id, pl.plant_name, s.material_id, m.material_name, m.uom, e.product_lines, dr.caused_by,
   s.on_hand_qty, s.safety_stock_qty, s.daily_usage_qty,
   round(s.on_hand_qty / s.daily_usage_qty, 1)                                    AS days_of_cover,
   CASE WHEN s.base_sim.first_out >= 0 THEN date_add(CAST('${as_of}' AS DATE), s.base_sim.first_out) END AS baseline_stockout_date,
@@ -93,4 +101,5 @@ SELECT
 FROM sim s
 JOIN econ e              ON e.plant_id = s.plant_id AND e.material_id = s.material_id
 JOIN ${catalog}.ref.plants pl    ON pl.plant_id = s.plant_id
-JOIN ${catalog}.ref.materials m  ON m.material_id = s.material_id;
+JOIN ${catalog}.ref.materials m  ON m.material_id = s.material_id
+LEFT JOIN drivers dr             ON dr.plant_id = s.plant_id AND dr.material_id = s.material_id;

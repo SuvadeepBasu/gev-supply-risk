@@ -3,12 +3,12 @@
 -- procurement questions with vetted logic instead of writing it from scratch.
 
 CREATE OR REPLACE FUNCTION ${catalog}.gold.fn_plant_disruption(p_plant_id STRING)
-RETURNS TABLE (plant_id STRING, plant_name STRING, material_name STRING, product_lines STRING,
+RETURNS TABLE (plant_id STRING, plant_name STRING, material_name STRING, product_lines STRING, caused_by STRING,
                days_of_cover DOUBLE, disrupted_stockout_date DATE, production_days_lost DOUBLE,
                cases_at_risk DOUBLE, revenue_at_risk_usd DOUBLE, margin_at_risk_usd DOUBLE)
-COMMENT 'Materials at a plant whose delayed POs cause a new shortage, with lost cases, revenue and margin. Pass NULL for all plants.'
+COMMENT 'Materials at a plant whose delayed POs cause a new shortage, with the hazards that caused it (caused_by) and lost cases, revenue and margin. Pass NULL for all plants.'
 RETURN
-  SELECT plant_id, plant_name, material_name, product_lines, days_of_cover, disrupted_stockout_date,
+  SELECT plant_id, plant_name, material_name, product_lines, caused_by, days_of_cover, disrupted_stockout_date,
          production_days_lost, cases_at_risk, revenue_at_risk_usd, margin_at_risk_usd
   FROM ${catalog}.gold.plant_material_impact
   WHERE has_new_shortage AND (p_plant_id IS NULL OR plant_id = p_plant_id)

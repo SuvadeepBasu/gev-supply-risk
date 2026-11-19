@@ -10,3 +10,4 @@ COMMENT ON TABLE ${catalog}.ref.expedite_rules IS 'Expedite option per transport
 COMMENT ON TABLE ${catalog}.ops.purchase_orders IS 'Open purchase order lines. status OPEN = not yet shipped, IN_TRANSIT = shipped. plant_eta_date is the promised arrival at the plant.';
 COMMENT ON TABLE ${catalog}.ops.inventory IS 'Inventory snapshot per plant and material: on hand, safety stock and average daily usage.';
 COMMENT ON TABLE ${catalog}.silver.hazard_events IS 'Active hazards: cyclones (severity = category, one row per forecast point), earthquakes (severity = magnitude), port congestion (severity = average wait hours). radius_km is the impact radius.';
+COMMENT ON TABLE ${catalog}.gold.plant_material_impact IS 'One row per plant and material: days of cover, stockout dates with promised vs delayed deliveries, production days, cases, revenue and margin lost. caused_by lists the hazards behind the delay. has_new_shortage marks shortages caused by hazards.';
