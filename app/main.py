@@ -18,6 +18,7 @@ from pydantic import BaseModel
 import data
 import genie
 
+logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("gev")
 STATIC = Path(__file__).parent / "static"
 app = FastAPI(title="God's Eye View · Supply Risk Forecast")
@@ -98,11 +99,13 @@ def genie_space_id() -> str:
 
 @app.post("/api/ask")
 def ask(body: Ask):
-    space = genie_space_id()
     if not body.question.strip():
         raise HTTPException(400, "Empty question")
     try:
+        space = genie_space_id()
         return genie.ask(workspace(), space, body.question.strip(), body.conversation_id)
+    except HTTPException:
+        raise
     except Exception as e:
         log.exception("genie failed")
         raise HTTPException(502, f"Genie request failed: {e}")

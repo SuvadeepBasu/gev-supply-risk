@@ -108,3 +108,16 @@ body { display:grid; grid-template-rows:auto auto 1fr; height:100vh; overflow:hi
 .ask button { width:42px; border:0; border-radius:10px; background:var(--cyan); color:#02161C; font-size:16px; }
 .ask button:disabled { opacity:.4; cursor:default; }
 @media (max-width: 1100px) { .grid { grid-template-columns:1fr 360px; } .kpis { grid-template-columns:repeat(3,1fr); } .legend-map { display:none; } }
+
+.ic { width:18px; height:18px; display:block; }
+.newchat { white-space:nowrap; flex:none; display:inline-flex; align-items:center; gap:8px; padding:8px 14px; border-radius:10px; font-size:13px; font-weight:600; color:#02161C;
+  background:linear-gradient(135deg,#4FE3FF,#3FD6B5); border:0; box-shadow:0 4px 14px rgba(79,227,255,.25); transition:transform .15s, box-shadow .15s; }
+.newchat:hover { transform:translateY(-1px); box-shadow:0 6px 18px rgba(79,227,255,.38); }
+.newchat .ic { width:16px; height:16px; }
+.tools button { display:grid; place-items:center; color:var(--ink2); }
+.tools button:hover { color:var(--ink); }
+.ask button { display:grid; place-items:center; }
+.notes { margin-top:8px; font-size:12px; color:#FFC9A8; display:flex; flex-direction:column; gap:4px; }
+.raw { margin-top:8px; font-size:12px; color:var(--ink2); }
+.raw summary { cursor:pointer; color:var(--cyan); }
+.raw pre { max-height:240px; overflow:auto; background:#070C11; border:1px solid var(--line); border-radius:8px; padding:8px; font-size:11px; white-space:pre-wrap; word-break:break-word; }

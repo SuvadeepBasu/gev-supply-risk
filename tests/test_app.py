@@ -82,3 +82,14 @@ assert fake.calls[-1] == ("follow", "c1", "and suppliers?") and r2["conversation
 assert c.post("/api/ask", json={"question": "  "}).status_code == 400
 print("api ok:", r["rows"][:3])
 print("ALL APP TESTS PASSED")
+
+# ---- empty answer: app re-reads the message and returns diagnostics instead of a blank reply
+class Empty:
+    def start_conversation_and_wait(self, s, q, timeout=None):
+        return NS(conversation_id="c9", message_id="m9", id="m9", status=NS(value="FAILED"), error=NS(error="warehouse not accessible"), attachments=[], as_dict=lambda: {"status": "FAILED"})
+    def get_message(self, s, c, m):
+        return self.start_conversation_and_wait(s, "")
+main._w = NS(genie=Empty())
+r3 = c.post("/api/ask", json={"question": "anything"}).json()
+assert r3["status"] == "FAILED" and any("warehouse not accessible" in n for n in r3["notes"]) and r3["raw"] == {"status": "FAILED"}, r3
+print("diagnostics ok:", r3["notes"])

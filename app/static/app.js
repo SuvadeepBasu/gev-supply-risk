@@ -94,7 +94,9 @@ async function ask(question) {
     conversationId = j.conversation_id;
     const res = j.columns.length ? renderResult(j.columns, j.rows, question) : null;
     const f = focusFrom(j.text, j.rows, question);
-    let html = `<div class="txt">${md(j.text || (j.rows.length ? "Here is what I found." : "I couldn't find an answer to that."))}</div>`;
+    let html = `<div class="txt">${md(j.text || (j.rows.length ? "Here is what I found." : "Genie didn't return an answer for this one."))}</div>`;
+    if (j.notes?.length) html += `<div class="notes">${j.notes.map((n) => `<div>${esc(n)}</div>`).join("")}</div>`;
+    if (j.raw) html += `<details class="raw"><summary>What Genie returned (for troubleshooting)</summary><pre>${esc(JSON.stringify(j.raw, null, 2).slice(0, 6000))}</pre></details>`;
     if (res && res.chart) html += `<div class="card"><div class="cth"><span>${esc(res.title)}</span><button class="tt">Show table</button></div>${res.chart}<div class="tw" hidden>${res.table}</div></div>`;
     else if (res && res.table) html += `<div class="card">${res.table}</div>`;
     if (f) html += `<div class="mapnote">◉ Highlighted on the map</div>`;

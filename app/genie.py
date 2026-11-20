@@ -2,6 +2,10 @@
 from __future__ import annotations
 
 import datetime as dt
+import json
+import logging
+
+log = logging.getLogger("gev.genie")
 
 
 def _val(v, type_name):
@@ -39,24 +43,47 @@ def ask(w, space_id: str, question: str, conversation_id: str | None = None, max
         msg = w.genie.create_message_and_wait(space_id, conversation_id, question, timeout=timeout)
     else:
         msg = w.genie.start_conversation_and_wait(space_id, question, timeout=timeout)
-    out = {"conversation_id": msg.conversation_id, "message_id": getattr(msg, "message_id", None) or msg.id,
-           "text": "", "sql": None, "description": None, "columns": [], "rows": [], "suggestions": [],
-           "status": str(getattr(msg, "status", ""))}
+    mid = getattr(msg, "message_id", None) or msg.id
+    # the waiter can return before attachments are filled in; re-read the finished message once
+    if not msg.attachments:
+        try:
+            msg = w.genie.get_message(space_id, msg.conversation_id, mid)
+        except Exception as e:  # noqa: BLE001
+            log.warning("get_message failed: %s", e)
+    status = getattr(getattr(msg, "status", None), "value", str(getattr(msg, "status", "")))
+    out = {"conversation_id": msg.conversation_id, "message_id": mid, "status": status,
+           "text": "", "sql": None, "description": None, "columns": [], "rows": [], "suggestions": [], "notes": []}
     texts = []
     for att in msg.attachments or []:
-        if getattr(att, "text", None) and att.text.content:
-            texts.append(att.text.content)
-        if getattr(att, "query", None):
-            out["sql"] = att.query.query
-            out["description"] = getattr(att.query, "description", None)
-            att_id = getattr(att, "attachment_id", None) or getattr(att, "id", None)
-            res = w.genie.get_message_attachment_query_result(space_id, msg.conversation_id, out["message_id"], att_id)
-            cols, rows = statement_rows(res.statement_response)
-            out["columns"], out["rows"] = cols, rows[:max_rows]
+        txt = getattr(att, "text", None)
+        if txt is not None and getattr(txt, "content", None):
+            texts.append(txt.content)
+        q = getattr(att, "query", None)
+        if q is not None:
+            out["sql"] = getattr(q, "query", None)
+            out["description"] = getattr(q, "description", None) or getattr(q, "title", None)
+            att_id = getattr(att, "attachment_id", None) or getattr(q, "id", None)
+            try:
+                res = w.genie.get_message_attachment_query_result(space_id, msg.conversation_id, mid, att_id)
+                cols, rows = statement_rows(res.statement_response)
+                out["columns"], out["rows"] = cols, rows[:max_rows]
+            except Exception as e:  # noqa: BLE001
+                log.exception("query result failed")
+                out["notes"].append(f"Genie wrote a query but its result could not be read: {e}")
         sq = getattr(att, "suggested_questions", None)
-        if sq and getattr(sq, "questions", None):
+        if sq is not None and getattr(sq, "questions", None):
             out["suggestions"] = list(sq.questions)[:3]
     out["text"] = "\n\n".join(texts) or (out["description"] or "")
-    if not out["text"] and getattr(msg, "error", None):
-        out["text"] = f"Genie could not answer: {msg.error}"
+    err = getattr(msg, "error", None)
+    if err:
+        out["notes"].append(f"Genie error: {getattr(err, 'error', None) or err}")
+    if status and status != "COMPLETED":
+        out["notes"].append(f"Genie finished with status {status}.")
+    if not out["text"] and not out["rows"]:
+        try:
+            raw = msg.as_dict()
+        except Exception:  # noqa: BLE001
+            raw = {"repr": repr(msg)[:4000]}
+        out["raw"] = raw
+        log.warning("empty Genie answer: %s", json.dumps(raw, default=str)[:4000])
     return out
