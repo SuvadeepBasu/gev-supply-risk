@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>God's Eye View · Supply Risk Forecast</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand"><span class="eye"></span><div><div class="b1">GOD'S EYE VIEW</div><div class="b2">Supply Risk Forecast</div></div></div>
+  <div class="status"><span class="dot" id="liveDot"></span><span id="asOf">Connecting to your workspace…</span></div>
+  <div class="seg" role="group" aria-label="Map view">
+    <button id="btn2d" class="on" aria-pressed="true">2D map</button><button id="btn3d" aria-pressed="false">3D globe</button>
+  </div>
+</header>
+<section class="kpis" id="kpis" aria-label="Key figures"></section>
+<main class="grid">
+  <section class="mapwrap" id="mapHost">
+    <canvas id="map" aria-label="Supply network map"></canvas>
+    <div class="banner" id="banner" hidden></div>
+    <div class="panel layers" id="layers"><div class="ph">Layers</div></div>
+    <div class="panel events" id="events"><div class="ph">Active hazards</div><div id="eventList"></div></div>
+    <div class="tools">
+      <button id="zin" aria-label="Zoom in">+</button><button id="zout" aria-label="Zoom out">−</button><button id="home" aria-label="Reset view">⌂</button>
+    </div>
+    <div class="focusbar" id="focusbar" hidden><span id="focusText"></span><button id="clearFocus">Show everything</button></div>
+    <div class="timeline" id="timeline">
+      <button id="play" aria-label="Pause forecast">❚❚</button>
+      <input id="scrub" type="range" min="0" max="120" step="1" value="0" aria-label="Forecast hour">
+      <span id="hourLabel">T+0 h</span>
+    </div>
+    <div class="hud" id="hud"></div>
+    <div class="legend-map">
+      <span><i class="sq" style="background:#FF6B4A"></i>Plant · high risk</span><span><i class="sq" style="background:#4FE3FF"></i>Plant</span>
+      <span><i class="ci" style="background:#4FE3FF"></i>Supplier</span><span><i class="ci" style="background:#F0A63C"></i>In a hazard</span>
+      <span><i class="di"></i>Port</span><span><i class="dl"></i>Delayed shipment</span><span><i class="gl"></i>Re-source option</span>
+    </div>
+  </section>
+  <aside class="chat" aria-label="Ask about supply risk">
+    <div class="ch">
+      <div><div class="ct">Ask Supply Risk Forecast</div><div class="cs">Plain-English questions about delays, shortages and what to do</div></div>
+      <button id="newChat" class="ghost">New chat</button>
+    </div>
+    <div class="msgs" id="msgs">
+      <div class="welcome" id="welcome">
+        <div class="wt">What would you like to know?</div>
+        <div class="wsub">Answers come from your live risk tables. Places in the answer light up on the map.</div>
+        <div class="starters" id="starters"></div>
+      </div>
+    </div>
+    <form class="ask" id="askForm">
+      <textarea id="q" rows="1" placeholder="e.g. Which plants run out first because of the storm?"></textarea>
+      <button type="submit" id="send" aria-label="Send">➤</button>
+    </form>
+  </aside>
+</main>
+<script src="/static/charts.js"></script>
+<script src="/static/map.js"></script>
+<script src="/static/app.js"></script>
+</body>
+</html>

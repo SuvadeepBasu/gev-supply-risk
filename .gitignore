@@ -1,5 +1,6 @@
-__pycache__/
 *.pyc
 .databricks/
-/tmp/
 .venv/
+/tmp/
+__pycache__/
+app/static/demo/
