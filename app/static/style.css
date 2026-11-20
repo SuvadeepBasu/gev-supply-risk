@@ -53,7 +53,7 @@ body { display:grid; grid-template-rows:auto auto 1fr; height:100vh; overflow:hi
 .dl { width:16px; border-top:2px dashed var(--amber); } .gl { width:16px; border-top:2px dashed var(--green); }
 .focusbar { position:absolute; top:12px; left:50%; transform:translateX(-50%); background:rgba(15,42,51,.95); border:1px solid var(--cyan); border-radius:20px; padding:6px 8px 6px 14px; display:flex; gap:10px; align-items:center; font-size:12.5px; }
 .focusbar button { border:0; background:var(--cyan); color:#02161C; border-radius:14px; padding:3px 10px; font-weight:600; font-size:12px; }
-.banner { position:absolute; inset:auto 12px 12px auto; top:60px; right:60px; left:250px; background:#2A1410; border:1px solid var(--red); color:#FFD7CC; padding:10px 14px; border-radius:8px; font-size:13px; z-index:3; }
+.banner { position:absolute; top:60px; right:60px; left:250px; height:auto; background:#2A1410; border:1px solid var(--red); color:#FFD7CC; padding:10px 14px; border-radius:8px; font-size:13px; z-index:3; }
 .chat { display:flex; flex-direction:column; border-left:1px solid var(--line); background:var(--panel); min-height:0; }
 .ch { display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border-bottom:1px solid var(--line); }
 .ct { font-weight:600; } .cs { font-size:12px; color:var(--ink3); }
