@@ -93,3 +93,8 @@ main._w = NS(genie=Empty())
 r3 = c.post("/api/ask", json={"question": "anything"}).json()
 assert r3["status"] == "FAILED" and any("warehouse not accessible" in n for n in r3["notes"]) and r3["raw"] == {"status": "FAILED"}, r3
 print("diagnostics ok:", r3["notes"])
+
+u = c.get("/api/me", headers={"X-Forwarded-Email": "suvadeep.basu@gmail.com", "X-Forwarded-Preferred-Username": "suvadeep.basu@gmail.com"}).json()
+assert u == {"name": "Suvadeep Basu", "email": "suvadeep.basu@gmail.com", "initials": "SB"}, u
+assert c.get("/api/me", headers={"X-Forwarded-Email": "suvadeepbasu1990@gmail.com"}).json()["initials"] == "S"
+print("user ok:", u)

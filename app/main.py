@@ -10,7 +10,9 @@ import logging
 import os
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException
+import re
+
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -56,6 +58,40 @@ class Ask(BaseModel):
 @app.get("/")
 def index():
     return FileResponse(STATIC / "index.html")
+
+
+_names: dict[str, str] = {}
+
+
+def _display_name(raw: str) -> str:
+    """'suvadeep.basu@x.com' or 'Suvadeep Basu' -> 'Suvadeep Basu'."""
+    local = (raw or "").split("@")[0]
+    parts = [p for p in re.split(r"[._\-\s]+", local) if p and not p.isdigit()]
+    return " ".join(p[:1].upper() + p[1:] for p in parts)
+
+
+@app.get("/api/me")
+def me(request: Request):
+    """Databricks Apps forwards the signed-in user's identity in request headers."""
+    h = request.headers
+    email = h.get("x-forwarded-email", "")
+    name = ""
+    token = h.get("x-forwarded-access-token")
+    if token:  # real display name via the user's own token (default scope iam.current-user:read)
+        key = token[-24:]
+        if key not in _names:
+            try:
+                from databricks.sdk import WorkspaceClient
+                u = WorkspaceClient(host=workspace().config.host, token=token, auth_type="pat").current_user.me()
+                _names[key] = (u.display_name or "").strip()
+            except Exception as e:  # noqa: BLE001
+                log.info("display name lookup failed: %s", e)
+                _names[key] = ""
+        name = _names[key]
+    if not name or "@" in name:
+        name = _display_name(h.get("x-forwarded-preferred-username") or email)
+    initials = "".join(w[0] for w in name.split()[:1] + name.split()[1:][-1:]).upper() if name else ""
+    return {"name": name, "email": email, "initials": initials}
 
 
 @app.get("/api/health")

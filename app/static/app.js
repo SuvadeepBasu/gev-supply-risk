@@ -126,8 +126,16 @@ function hud(m) {
   }
 }
 
+async function who() {
+  try {
+    const u = await (await fetch("/api/me")).json(); if (!u.initials) return;
+    $("avatar").textContent = u.initials; $("userName").textContent = u.name; $("userEmail").textContent = u.email;
+    $("user").title = `Signed in as ${u.name}${u.email ? " (" + u.email + ")" : ""}`; $("user").hidden = false;
+  } catch (_) {}
+}
+
 async function boot() {
-  kpis(null); starters();
+  kpis(null); starters(); who();
   map = new GeoMap($("map"), $("mapHost"), await loadGeo(), hud);
   layers();
   $("btn2d").onclick = () => { map.setMode("2d"); $("btn2d").className = "on"; $("btn3d").className = ""; $("btn2d").setAttribute("aria-pressed", "true"); $("btn3d").setAttribute("aria-pressed", "false"); };

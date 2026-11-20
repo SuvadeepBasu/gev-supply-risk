@@ -128,3 +128,9 @@ body { display:grid; grid-template-rows:auto auto 1fr; height:100vh; overflow:hi
 .newchat:hover::after { left:130%; }
 .newchat:hover .ic { transform:rotate(-12deg) scale(1.05); }
 .newchat:active { transform:translateY(0) scale(.98); }
+
+.user { display:flex; align-items:center; gap:10px; padding-left:16px; border-left:1px solid var(--line); }
+.ut { text-align:right; line-height:1.2; } .un { font-size:13px; font-weight:600; } .ue { font-size:11px; color:var(--ink3); }
+.avatar { width:36px; height:36px; border-radius:50%; display:grid; place-items:center; font-weight:700; font-size:13px; letter-spacing:.04em; color:#03161B;
+  background:linear-gradient(135deg,#7CF0FF,#3FD6B5); box-shadow:0 0 0 2px #060A0F, 0 0 0 3px rgba(79,227,255,.6), 0 0 16px rgba(79,227,255,.35); }
+@media (max-width: 1300px) { .ut { display:none; } }
