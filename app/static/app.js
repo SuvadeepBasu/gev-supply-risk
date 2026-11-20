@@ -61,9 +61,6 @@ function focusFrom(text, rows, question) {
 }
 function applyFocus(f) {
   map.setFocus(f);
-  if (!f) { $("focusbar").hidden = true; return; }
-  const parts = [[f.plants.size, "plant"], [f.suppliers.size, "supplier"], [f.ports.size, "port"]].filter((x) => x[0]).map(([n, w]) => `${n} ${w}${n > 1 ? "s" : ""}`);
-  $("focusText").textContent = "Showing " + parts.join(", ") + " from the answer"; $("focusbar").hidden = false;
 }
 
 // ---- chat
@@ -136,7 +133,7 @@ async function boot() {
   $("btn2d").onclick = () => { map.setMode("2d"); $("btn2d").className = "on"; $("btn3d").className = ""; $("btn2d").setAttribute("aria-pressed", "true"); $("btn3d").setAttribute("aria-pressed", "false"); };
   $("btn3d").onclick = () => { map.setMode("3d"); $("btn3d").className = "on"; $("btn2d").className = ""; $("btn3d").setAttribute("aria-pressed", "true"); $("btn2d").setAttribute("aria-pressed", "false"); };
   $("zin").onclick = () => map.zoomBy(1.5); $("zout").onclick = () => map.zoomBy(1 / 1.5); $("home").onclick = () => applyFocus(null) || map.home();
-  $("clearFocus").onclick = () => { applyFocus(null); map.home(); };
+  document.addEventListener("keydown", (e) => { if (e.altKey && e.code === "KeyN") { e.preventDefault(); $("newChat").click(); } });
   $("play").onclick = () => { map.playing = !map.playing; $("play").textContent = map.playing ? "❚❚" : "▶"; $("play").setAttribute("aria-label", map.playing ? "Pause forecast" : "Play forecast"); };
   $("scrub").oninput = (e) => { map.hourF = +e.target.value; map.playing = false; $("play").textContent = "▶"; };
   $("askForm").onsubmit = (e) => { e.preventDefault(); ask($("q").value); };

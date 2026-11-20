@@ -24,7 +24,6 @@
     <div class="tools">
       <button id="zin" aria-label="Zoom in" title="Zoom in"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg></button><button id="zout" aria-label="Zoom out" title="Zoom out"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/></svg></button><button id="home" aria-label="Reset view" title="Reset view"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.5"/></svg></button>
     </div>
-    <div class="focusbar" id="focusbar" hidden><span id="focusText"></span><button id="clearFocus">Show everything</button></div>
     <div class="timeline" id="timeline">
       <button id="play" aria-label="Pause forecast">❚❚</button>
       <input id="scrub" type="range" min="0" max="120" step="1" value="0" aria-label="Forecast hour">
@@ -40,7 +39,7 @@
   <aside class="chat" aria-label="Ask about supply risk">
     <div class="ch">
       <div><div class="ct">Ask Supply Risk Forecast</div><div class="cs">Plain-English questions about delays, shortages and what to do</div></div>
-      <button id="newChat" class="newchat" title="Start a new conversation"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg><span>New chat</span></button>
+      <button id="newChat" class="newchat" title="Start a new conversation"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg><span>New chat</span><kbd>Alt+N</kbd></button>
     </div>
     <div class="msgs" id="msgs">
       <div class="welcome" id="welcome">
