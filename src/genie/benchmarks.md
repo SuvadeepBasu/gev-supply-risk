@@ -14,7 +14,7 @@ Expected result:
 
 ```
 as_of_date  margin_at_risk_usd
-2026-11-18         1,163,072.0
+2026-11-18         1,162,614.0
 ```
 
 ## 2. How many open PO lines are delayed, and what is their value?
@@ -56,7 +56,7 @@ Expected result:
 
 ```
              event_name  margin_at_risk_usd
-           Storm BOB-07         1,143,038.0
+           Storm BOB-07         1,142,580.0
 Chennai port congestion            20,034.0
    M5.6 central Myanmar                 0.0
 ```
@@ -174,8 +174,8 @@ Expected result:
 recommended_action  po_lines  action_cost_usd  margin_protected_usd
          Re-source        11         57,486.0             946,813.0
           Expedite         1         32,510.0              53,091.0
-         No action         4              0.0                   0.0
-           Monitor         2              0.0                   0.0
+         No action         5              0.0                   0.0
+           Monitor         1              0.0                   0.0
 ```
 
 ## 12. Show delayed POs for the Kolkata plant with the recommended action
@@ -191,7 +191,7 @@ Expected result:
   po_id     material_name     supplier_name  delay_days recommended_action
 PO-1202 Corrugate cartons Kalinga Packaging           7          Re-source
 PO-1223      PET preforms   Haldia Polymers           4            Monitor
-PO-1208    Laminated film   Haldia Polymers           4            Monitor
+PO-1208    Laminated film   Haldia Polymers           4          No action
 ```
 
 ## 13. Which delayed POs need no action because stock covers the delay?
@@ -204,11 +204,12 @@ SELECT po_id, plant_name, material_name, delay_days FROM supply_risk_dev.gold.po
 Expected result:
 
 ```
-  po_id             plant_name  material_name  delay_days
-PO-1243 Chennai beverage plant Aluminium cans           2
-PO-1254 Chennai beverage plant Food-grade CO2           2
-PO-1270 Chennai beverage plant         Labels           3
-PO-1290      Pune snacks plant Laminated film           3
+  po_id                      plant_name  material_name  delay_days
+PO-1208 Kolkata beverage & snacks plant Laminated film           4
+PO-1243          Chennai beverage plant Aluminium cans           2
+PO-1254          Chennai beverage plant Food-grade CO2           2
+PO-1270          Chennai beverage plant         Labels           3
+PO-1290               Pune snacks plant Laminated film           3
 ```
 
 ## 14. Which suppliers sit inside an active hazard?

@@ -62,6 +62,8 @@ def main():
         check(abs(r.disrupted_lost_qty - round(ld)) <= 1, f"disrupted lost mismatch {row.plant_id}/{row.material_id}")
         if not sub.is_delayed.any():
             check(r.incremental_lost_qty == 0, f"no delayed PO but impact at {row.plant_id}/{row.material_id}")
+        if not r.has_new_shortage:
+            check(r.margin_at_risk_usd == 0, f"margin without a new shortage at {row.plant_id}/{row.material_id}")
 
     # 3. Actions never claim to protect more than is at risk, and cost is only spent when it pays
     check((act.margin_protected_usd <= act.margin_at_risk_usd + 1).all(), "protected > at risk")
@@ -72,6 +74,7 @@ def main():
     check(abs(act.margin_at_risk_usd.sum() - kpi.margin_at_risk_usd) <= 5, "PO-level margin != KPI margin")
     check(abs(ev.margin_at_risk_usd.sum() - kpi.margin_at_risk_usd) <= 5, "event margin != KPI margin")
     check(kpi.delayed_po_lines == po.is_delayed.sum(), "delayed count mismatch")
+    check(abs(imp[imp.has_new_shortage].margin_at_risk_usd.sum() - kpi.margin_at_risk_usd) <= 5, "shortage-filtered margin != KPI margin")
 
     print(f"\nChecked {len(inv)} plant-material simulations, {len(po)} PO lines, {len(act)} actions.")
     if failures:

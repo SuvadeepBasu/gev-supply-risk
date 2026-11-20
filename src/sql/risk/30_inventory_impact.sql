@@ -10,6 +10,15 @@
 -- from the hazard. Without this cut-off, late gaps in the order book get netted
 -- against the real loss and understate it.
 CREATE OR REPLACE TABLE ${catalog}.gold.plant_material_impact AS
+-- Losses below the new-shortage threshold are set to zero, so every total
+-- matches whether it is filtered on has_new_shortage or on margin > 0.
+SELECT * EXCEPT (incremental_lost_qty, production_days_lost, cases_at_risk, revenue_at_risk_usd, margin_at_risk_usd),
+       CASE WHEN has_new_shortage THEN incremental_lost_qty ELSE 0D END AS incremental_lost_qty,
+       CASE WHEN has_new_shortage THEN production_days_lost ELSE 0D END AS production_days_lost,
+       CASE WHEN has_new_shortage THEN cases_at_risk        ELSE 0D END AS cases_at_risk,
+       CASE WHEN has_new_shortage THEN revenue_at_risk_usd  ELSE 0D END AS revenue_at_risk_usd,
+       CASE WHEN has_new_shortage THEN margin_at_risk_usd   ELSE 0D END AS margin_at_risk_usd
+FROM (
 WITH days AS (
   SELECT explode(sequence(0, 59)) AS d
 ),
@@ -105,4 +114,5 @@ FROM sim s
 JOIN econ e              ON e.plant_id = s.plant_id AND e.material_id = s.material_id
 JOIN ${catalog}.ref.plants pl    ON pl.plant_id = s.plant_id
 JOIN ${catalog}.ref.materials m  ON m.material_id = s.material_id
-LEFT JOIN drivers dr             ON dr.plant_id = s.plant_id AND dr.material_id = s.material_id;
+LEFT JOIN drivers dr             ON dr.plant_id = s.plant_id AND dr.material_id = s.material_id
+);
