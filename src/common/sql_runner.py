@@ -32,6 +32,8 @@ def run_sql_file(spark, path: str | Path, catalog: str, as_of: str, local: bool 
     path = Path(path)
     if not path.is_absolute():
         path = SQL_DIR / path
+    if local and "comments" in path.name:
+        return  # table/column comments are a Unity Catalog feature; skipped on local Spark
     for stmt in _statements(render(path.read_text(), catalog, as_of, local)):
         if local:
             m = re.match(r"CREATE\s+OR\s+REPLACE\s+TABLE\s+(\S+)\s+AS\s", stmt, re.I)
@@ -51,4 +53,5 @@ RISK_FILES = [
     "risk/30_inventory_impact.sql",
     "risk/40_po_actions.sql",
     "risk/50_kpis.sql",
+    "risk/90_gold_comments.sql",
 ]

@@ -97,7 +97,10 @@ SELECT
   round(greatest(s.dis_sim.lost - s.base_sim.lost, 0D) * e.revenue_per_material_unit, 0) AS revenue_at_risk_usd,
   round(greatest(s.dis_sim.lost - s.base_sim.lost, 0D) * e.margin_per_material_unit, 0)  AS margin_at_risk_usd,
   -- material shortage of at least a tenth of a production day counts as a new shortage
-  s.dis_sim.lost - s.base_sim.lost >= 0.1 * s.daily_usage_qty                     AS has_new_shortage
+  s.dis_sim.lost - s.base_sim.lost >= 0.1 * s.daily_usage_qty                     AS has_new_shortage,
+  -- the date the plant runs out BECAUSE OF the hazards; empty when there is no new shortage
+  CASE WHEN s.dis_sim.lost - s.base_sim.lost >= 0.1 * s.daily_usage_qty AND s.dis_sim.first_out >= 0
+       THEN date_add(CAST('${as_of}' AS DATE), s.dis_sim.first_out) END        AS new_stockout_date
 FROM sim s
 JOIN econ e              ON e.plant_id = s.plant_id AND e.material_id = s.material_id
 JOIN ${catalog}.ref.plants pl    ON pl.plant_id = s.plant_id

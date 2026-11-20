@@ -79,36 +79,36 @@ Expected result:
 *Hazards*
 
 ```sql
-SELECT plant_name, material_name, disrupted_stockout_date FROM supply_risk_dev.gold.plant_material_impact WHERE has_new_shortage AND caused_by LIKE '%Storm BOB-07%' ORDER BY disrupted_stockout_date
+SELECT plant_name, material_name, new_stockout_date FROM supply_risk_dev.gold.plant_material_impact WHERE has_new_shortage AND caused_by LIKE '%Storm BOB-07%' ORDER BY new_stockout_date
 ```
 
 Expected result:
 
 ```
-                       plant_name     material_name disrupted_stockout_date
-  Kolkata beverage & snacks plant      PET preforms              2026-11-24
-  Kolkata beverage & snacks plant Corrugate cartons              2026-11-25
-       Bhubaneswar beverage plant    Aluminium cans              2026-11-25
-Hyderabad snacks & beverage plant    Food-grade CO2              2026-11-25
-                              ...               ...                     ...
-Hyderabad snacks & beverage plant          Potatoes              2026-11-29
-Delhi NCR beverage & snacks plant Corrugate cartons              2026-11-30
-       Bhubaneswar beverage plant             Sugar              2026-11-30
-Delhi NCR beverage & snacks plant          Potatoes              2026-12-01
+                       plant_name     material_name new_stockout_date
+  Kolkata beverage & snacks plant      PET preforms        2026-11-24
+  Kolkata beverage & snacks plant Corrugate cartons        2026-11-25
+       Bhubaneswar beverage plant    Aluminium cans        2026-11-25
+Hyderabad snacks & beverage plant    Food-grade CO2        2026-11-25
+                              ...               ...               ...
+Hyderabad snacks & beverage plant          Potatoes        2026-11-29
+Delhi NCR beverage & snacks plant Corrugate cartons        2026-11-30
+       Bhubaneswar beverage plant             Sugar        2026-11-30
+Delhi NCR beverage & snacks plant          Potatoes        2026-12-01
 ```
 
 ## 7. Which plant runs out first, and of what?
 *Plants*
 
 ```sql
-SELECT plant_name, material_name, disrupted_stockout_date FROM supply_risk_dev.gold.plant_material_impact WHERE has_new_shortage ORDER BY disrupted_stockout_date, margin_at_risk_usd DESC LIMIT 1
+SELECT plant_name, material_name, new_stockout_date FROM supply_risk_dev.gold.plant_material_impact WHERE has_new_shortage ORDER BY new_stockout_date, margin_at_risk_usd DESC LIMIT 1
 ```
 
 Expected result:
 
 ```
-                     plant_name material_name disrupted_stockout_date
-Kolkata beverage & snacks plant  PET preforms              2026-11-24
+                     plant_name material_name new_stockout_date
+Kolkata beverage & snacks plant  PET preforms        2026-11-24
 ```
 
 ## 8. What is the margin at risk at the Delhi plant?
