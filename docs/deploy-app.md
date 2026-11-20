@@ -13,10 +13,15 @@ the **Supply Risk Forecast** Genie agent. No CLI needed — everything below is 
 2. Choose **Create a custom app**. Name: `gev-supply-risk`. Click **Next / Configure**.
 3. Under **App resources** → **Add resource**:
    - **SQL warehouse** → pick your Serverless Starter Warehouse → permission **Can use** → resource key `sql-warehouse`.
-   - **Genie space** → pick **Supply Risk Forecast** → permission **Can run** → resource key `genie-space`.
+   - No Genie resource is needed: the app finds the agent by its name, **Supply Risk Forecast**
+     (the Genie picker in the Apps UI may show no results in Free Edition).
 4. **Create app**. Wait until the compute shows **Running** (a few minutes).
 
-## 2. Give the app read access to the data
+## 2. Share the Genie agent with the app
+Open the **Supply Risk Forecast** Genie agent → **Share** → search for the app's service principal
+(`app-xxxx gev-supply-risk`) → **Can run** → Add.
+
+## 2b. Give the app read access to the data
 The app runs as its own service principal (shown on the app page under **App resource / Service principal**,
 named like `app-xxxx gev-supply-risk`). Copy its **application ID** and run this in a SQL editor:
 
@@ -42,7 +47,8 @@ Or click through it: **Catalog** → `supply_risk_dev` → **Permissions** → *
 | You see | Fix |
 |---|---|
 | Red banner "Couldn't load the risk tables… PERMISSION_DENIED" | Step 2 grants are missing for the app's service principal. |
-| "WAREHOUSE_ID is not set" / "GENIE_SPACE_ID is not set" | Resource keys must be exactly `sql-warehouse` and `genie-space`. Redeploy after fixing. |
+| "WAREHOUSE_ID is not set" | The SQL warehouse resource key must be exactly `sql-warehouse`. Redeploy after fixing. |
+| "The app can't see a Genie agent named …" | Share the agent with the app's service principal (step 2). If you renamed the agent, change `GENIE_SPACE_NAME` in `app/app.yaml`. |
 | Chat says "Genie request failed … permission" | Genie resource needs **Can run**; also the step 2 grants. |
 | App stopped next day | Free Edition stops apps after 24 h. App page → **Start**. |
 | Logs | App page → **Logs** tab. |

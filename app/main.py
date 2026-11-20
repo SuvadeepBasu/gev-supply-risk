@@ -59,7 +59,7 @@ def index():
 
 @app.get("/api/health")
 def health():
-    return {"ok": True, "warehouse": bool(os.getenv("WAREHOUSE_ID")), "genie": bool(os.getenv("GENIE_SPACE_ID")), "catalog": data.CATALOG}
+    return {"ok": True, "warehouse": bool(os.getenv("WAREHOUSE_ID")), "genie": os.getenv("GENIE_SPACE_ID") or os.getenv("GENIE_SPACE_NAME", "Supply Risk Forecast"), "catalog": data.CATALOG}
 
 
 @app.get("/api/map")
@@ -73,11 +73,32 @@ def map_data():
         raise HTTPException(502, f"Could not read {data.CATALOG} tables: {e}")
 
 
+_space = {"id": os.getenv("GENIE_SPACE_ID")}
+
+
+def genie_space_id() -> str:
+    """GENIE_SPACE_ID if set, otherwise look the agent up by name among spaces the app can access."""
+    if _space["id"]:
+        return _space["id"]
+    name = os.getenv("GENIE_SPACE_NAME", "Supply Risk Forecast").strip().lower()
+    token, seen = None, []
+    for _ in range(20):
+        resp = workspace().genie.list_spaces(page_size=100, page_token=token)
+        for s in resp.spaces or []:
+            seen.append(s.title)
+            if (s.title or "").strip().lower() == name:
+                _space["id"] = s.space_id
+                return s.space_id
+        token = resp.next_page_token
+        if not token:
+            break
+    raise HTTPException(500, f"The app can't see a Genie agent named '{name}'. Open the agent, click Share and give the app's "
+                             f"service principal Can run. Agents visible to the app: {', '.join(seen) or 'none'}.")
+
+
 @app.post("/api/ask")
 def ask(body: Ask):
-    space = os.getenv("GENIE_SPACE_ID")
-    if not space:
-        raise HTTPException(500, "GENIE_SPACE_ID is not set. Add the Genie agent as an app resource.")
+    space = genie_space_id()
     if not body.question.strip():
         raise HTTPException(400, "Empty question")
     try:

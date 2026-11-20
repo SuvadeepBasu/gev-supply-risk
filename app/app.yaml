@@ -3,7 +3,11 @@ command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 env:
   - name: WAREHOUSE_ID
     valueFrom: sql-warehouse      # add the SQL warehouse as an app resource (Can use)
-  - name: GENIE_SPACE_ID
-    valueFrom: genie-space        # add the Supply Risk Forecast Genie agent as a resource (Can run)
+  # The Genie agent is found by its name. Share it with the app's service principal (Can run).
+  # (If your workspace lets you pick it as an app resource with key genie-space, you can instead use:
+  #   - name: GENIE_SPACE_ID
+  #     valueFrom: genie-space )
+  - name: GENIE_SPACE_NAME
+    value: Supply Risk Forecast
   - name: CATALOG
     value: supply_risk_dev

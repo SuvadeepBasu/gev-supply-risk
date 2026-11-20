@@ -64,7 +64,7 @@ class FakeGenie:
         self.calls.append(("follow", conv, q)); return self._msg(conv, q)
 
     def get_message_attachment_query_result(self, space, conv, mid, aid):
-        assert aid == "a1"
+        assert aid == "a1" and space == "space1"
         cols = [NS(name="plant_id", type_name=NS(value="STRING")), NS(name="margin", type_name=NS(value="DOUBLE"))]
         return NS(statement_response=NS(manifest=NS(schema=NS(columns=cols)),
                                         result=NS(data_array=[[r["plant_id"], str(r["margin"])] for r in self.rows])))
@@ -73,7 +73,7 @@ class FakeGenie:
 fake = FakeGenie()
 main._w = NS(genie=fake)
 import os
-os.environ["GENIE_SPACE_ID"] = "space1"
+main._w.genie.list_spaces = lambda page_size=None, page_token=None: NS(spaces=[NS(title="Other", space_id="x"), NS(title="Supply Risk Forecast", space_id="space1")], next_page_token=None)
 r = c.post("/api/ask", json={"question": "Which plants lose the most margin?"}).json()
 assert r["conversation_id"] == "c1" and r["text"].startswith("Kolkata") and r["columns"][1]["name"] == "margin"
 assert isinstance(r["rows"][0][1], float) and r["suggestions"] == ["What should procurement do?"]
