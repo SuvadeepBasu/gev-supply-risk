@@ -65,11 +65,11 @@ class GeoMap {
     this.movers = []; let nt = 0, ns = 0, na = 0; const pad = (n) => String(n).padStart(2, "0");
     this.lanes.forEach((l, i) => {
       if (!(l.delayed || i % 4 === 0)) return;
-      if (l.mode === "road") this.movers.push(Object.assign(track(l.path), { kind: "truck", id: "TRK-" + pad(++nt), lane: l, period: 14000, off: (i * 0.37) % 1 }));
-      else if (l.path.length > 3) this.movers.push(Object.assign(track(l.path.slice(1, -1)), { kind: "ship", id: "SEA-" + pad(++ns), lane: l, period: 30000, off: (i * 0.37) % 1 }));
+      if (l.mode === "road") this.movers.push(Object.assign(track(l.path), { kind: "truck", id: "TRK-" + pad(++nt), lane: l, period: 42000, off: (i * 0.37) % 1 }));
+      else if (l.path.length > 3) this.movers.push(Object.assign(track(l.path.slice(1, -1)), { kind: "ship", id: "SEA-" + pad(++ns), lane: l, period: 300000, off: (i * 0.37) % 1 }));
       if (l.mode === "sea" && l.delayed) {
         const pl = this.byId[l.p], a = l.path[1], b = [pl.lon, pl.lat];
-        this.movers.push(Object.assign(track([a, b]), { kind: "plane", id: "AIR-" + pad(++na), lane: l, period: 9000, off: (i * 0.53) % 1, dense: densify([a, b], 1) }));
+        this.movers.push(Object.assign(track([a, b]), { kind: "plane", id: "AIR-" + pad(++na), lane: l, period: 30000, off: (i * 0.53) % 1, dense: densify([a, b], 1) }));
       }
     });
     if (!this.started) { this.started = true; this.flyTo(HOME2D, 2600); }
@@ -127,9 +127,9 @@ class GeoMap {
       cam.lon = f.from.lon + f.dl * e; cam.lat = f.from.lat + (f.to.lat - f.from.lat) * e;
       const z = f.from.zoom + (f.to.zoom - f.from.zoom) * e, hop = Math.max(0, Math.min(f.from.zoom, f.to.zoom) - 0.9) * 0.55 + 0.12;
       cam.zoom = Math.max(0.75, z - hop * Math.sin(Math.PI * p) * Math.min(1, z)); if (p >= 1) this.fly = null;
-    } else if (this.mode === "3d" && !this.focus && !this.drag && t - this.lastInteract > 3500) cam.lon += dt * 0.0035;
+    } else if (this.mode === "3d" && !this.focus && !this.drag && t - this.lastInteract > 3500) cam.lon += dt * 0.0015;
     cam.lon = ((cam.lon + 540) % 360) - 180;
-    if (this.playing) this.hourF = (this.hourF + dt * this.maxHour / 15000) % this.maxHour;
+    if (this.playing) this.hourF = (this.hourF + dt * this.maxHour / 60000) % this.maxHour;
     this.draw(t); this.onTick(this);
   }
   drawGlobeBase(t) {
@@ -236,7 +236,7 @@ class GeoMap {
       for (let k = 0; k < 2; k++) { const ph = ((t / 2200) + k / 2) % 1; ctx.beginPath(); this.line(circle([cg.lon, cg.lat], 0.08 + 0.55 * ph, 10)); ctx.strokeStyle = `rgba(240,166,60,${(1 - ph) * 0.7})`; ctx.lineWidth = 1.4; ctx.stroke(); }
       const n = Math.min(14, Math.max(4, Math.round(cg.hours / 3.5)));
       for (let k = 0; k < n; k++) {
-        const a = t / 14000 + k * 0.52, rr = 0.3 + (k % 4) * 0.16, v = this.pr([cg.lon + 0.95 + Math.cos(a) * rr, cg.lat + Math.sin(a) * rr * 0.8]); if (!v[2]) continue;
+        const a = t / 40000 + k * 0.52, rr = 0.3 + (k % 4) * 0.16, v = this.pr([cg.lon + 0.95 + Math.cos(a) * rr, cg.lat + Math.sin(a) * rr * 0.8]); if (!v[2]) continue;
         if (flat) { this.ship(v[0], v[1], 0.55, t, k); continue; }
         ctx.save(); ctx.translate(v[0], v[1]); ctx.rotate(a + 1.57); ctx.fillStyle = "#E6EDF3"; ctx.beginPath(); ctx.moveTo(0, -5); ctx.lineTo(2.6, 3); ctx.lineTo(-2.6, 3); ctx.closePath(); ctx.fill(); ctx.restore();
       }
@@ -250,7 +250,7 @@ class GeoMap {
       }
       if (!flat) for (const l of this.lanes) {
         if (this.laneDim(l) || l.delayed) continue;
-        const v = this.pr(pointAt(l, ((t / (l.mode === "sea" ? 18000 : 9000)) + l.off) % 1)); if (!v[2]) continue;
+        const v = this.pr(pointAt(l, ((t / (l.mode === "sea" ? 54000 : 27000)) + l.off) % 1)); if (!v[2]) continue;
         ctx.fillStyle = "#9AF0FF"; ctx.beginPath(); ctx.arc(v[0], v[1], 1.7, 0, Math.PI * 2); ctx.fill();
       }
       if (f && f.alts) {
@@ -258,7 +258,7 @@ class GeoMap {
         ctx.setLineDash([7, 6]); ctx.lineDashOffset = -t / 40; ctx.strokeStyle = "#5EE6A8"; ctx.lineWidth = 2;
         for (const a of alts) { ctx.beginPath(); this.line(a.dense); ctx.stroke(); }
         ctx.setLineDash([]); ctx.lineDashOffset = 0;
-        for (const a of alts) { const v = this.pr(a.f(((t / 5000) + a.off) % 1)); if (v[2]) { ctx.fillStyle = "#5EE6A8"; ctx.beginPath(); ctx.arc(v[0], v[1], 3, 0, Math.PI * 2); ctx.fill(); } }
+        for (const a of alts) { const v = this.pr(a.f(((t / 15000) + a.off) % 1)); if (v[2]) { ctx.fillStyle = "#5EE6A8"; ctx.beginPath(); ctx.arc(v[0], v[1], 3, 0, Math.PI * 2); ctx.fill(); } }
       }
     }
     if (!flat) ctx.restore();
